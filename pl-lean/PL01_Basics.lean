@@ -90,6 +90,7 @@ program being defined.
 #check false
 #check Bool         --- also types have types!
 
+
 #eval true
 #eval false
 
@@ -194,9 +195,12 @@ def andB (a b : Bool) : Bool :=
 __Exercise__: Define a function `orB` that implements the disjunction connective
 -/
 
-def orB (a b : Bool) : Bool :=
-  sorry
+def orB (a b : Bool) : Bool := a || b
 
+#check orB
+#eval orB true true
+#eval orB false true
+#eval orB false false
 
 /-
 
@@ -239,6 +243,8 @@ theorem andB_commutative_sorry (a b : Bool) : andB a b = andB b a := by sorry
 __Exercise__: Try to replace `sorry` with `rfl`, and see what happens in the Infoview.
 -/
 
+-- theorem andB_commutative_sorry2 (a b : Bool) : (andB a b = andB b a)  := by rfl
+
 /-
 Using `sorry` has several benefits:
 * The incomplete code is accepted, without generating any _error_.
@@ -278,9 +284,9 @@ def mystery : Bool → Bool :=
   For the moment, leave the `sorry` in `mystery_resolved`.
 -/
 
-def mystery₂ : Bool → Bool := sorry
+def mystery₂ : Bool → Bool := fun b => b
 
-theorem mystery_resolved (b: Bool): mystery b = mystery₂ b := by sorry
+theorem mystery_resolved (b: Bool): mystery b = mystery₂ b := by rfl
 
 
 /-
