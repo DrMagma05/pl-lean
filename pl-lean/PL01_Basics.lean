@@ -380,8 +380,12 @@ __Exercise__: the *exclusive or* is true when exactly one input is true.
 Define the connective, and give its truth table through examples.
 -/
 
-def xorB (a b : Bool) : Bool := sorry
+def xorB (a b : Bool) : Bool := (!a && b ) || (a && !b)
 
+example : (xorB false false) = false := by rfl
+example : (xorB false true) = true := by rfl
+example : (xorB true false) = true := by rfl
+example : (xorB true true) = false := by rfl
 
 
 /-
@@ -389,7 +393,13 @@ __Exercise__: the *nand* connective is true when not both inputs are true.
 Define the connective, and give its truth table through examples.
 -/
 
-def nandB (a b : Bool) : Bool := sorry
+def nandB (a b : Bool) : Bool := !(a && b)
+
+
+example : (nandB false false) = true := by rfl
+example : (nandB false true) = true := by rfl
+example : (nandB true false) = true := by rfl
+example : (nandB true true) = false := by rfl
 
 end Boolean_operators
 
