@@ -439,42 +439,40 @@ __Exercise__: try to write a conditional expression where the `true` branch eval
 a number, while the `false` branch evaluates to a string.
 Study the error displayed in the Infoview.
 -/
+-- def daraErrore (a : bool) := if a then 2 else "2"
 
 
 /-
 __Exercise__: Redefine the negation using conditional expressions.
 -/
 
-def negIf (b : Bool) : Bool :=
-  sorry
+def negIf (b : Bool) : Bool := if b then false else true
 
-example : negB true  = negIf true  := by sorry
-example : negB false = negIf false := by sorry
+example : negB true  = negIf true  := by rfl
+example : negB false = negIf false := by rfl
 
 /-
 __Exercise__: Redefine the implication connective using conditional expressions.
 -/
 
-def impIf (a b : Bool) : Bool :=
-  sorry
+def impIf (a b : Bool) : Bool := if !a then true else if b then true else false
 
-example : (impIf false false) = true  := by sorry
-example : (impIf false true)  = true  := by sorry
-example : (impIf true  false) = false := by sorry
-example : (impIf true  true)  = true  := by sorry
+example : (impIf false false) = true  := by rfl
+example : (impIf false true)  = true  := by rfl
+example : (impIf true  false) = false := by rfl
+example : (impIf true  true)  = true  := by rfl
 
 
 /-
 __Exercise__: Redefine the XOR connective using conditional expressions.
 -/
 
-def xorIf (a b : Bool) : Bool :=
-  sorry
+def xorIf (a b : Bool) : Bool := if a then !b else b
 
-example : (xorIf false false) = false := by sorry
-example : (xorIf false true)  = true  := by sorry
-example : (xorIf true  false) = true  := by sorry
-example : (xorIf true  true)  = false := by sorry
+example : (xorIf false false) = false := by rfl
+example : (xorIf false true)  = true  := by rfl
+example : (xorIf true  false) = true  := by rfl
+example : (xorIf true  true)  = false := by rfl
 
 
 /-
@@ -482,12 +480,13 @@ __Exercise__: Define a function `majority` that returns true when at least two
 of its three inputs are true.
 -/
 
-def majority (a b c : Bool) : Bool :=
-  sorry
+def majority (a b c : Bool) : Bool := if a && b then true else
+ if a && c then true else
+  if b && c then true else false
 
-example : majority true false true = true   := by sorry
-example : majority false true true = true   := by sorry
-example : majority false true false = false := by sorry
+example : majority true false true = true   := by rfl
+example : majority false true true = true   := by rfl
+example : majority false true false = false := by rfl
 
 
 end Conditional_expressions
@@ -547,24 +546,29 @@ example : andMatch false true = false := by rfl
 __Exercise__: Redefine the implication connective using pattern matching.
 -/
 
-def impMatch : Bool → Bool → Bool := sorry
+def impMatch : Bool → Bool → Bool
+  | true, false => false
+  | _, _ => true
 
-example : (impMatch false false) = true  := by sorry
-example : (impMatch false true)  = true  := by sorry
-example : (impMatch true  false) = false := by sorry
-example : (impMatch true  true)  = true  := by sorry
+example : (impMatch false false) = true  := by rfl
+example : (impMatch false true)  = true  := by rfl
+example : (impMatch true  false) = false := by rfl
+example : (impMatch true  true)  = true  := by rfl
 
 
 /-
 __Exercise__: Redefine the XOR connective using pattern matching.
 -/
 
-def xorMatch : Bool → Bool → Bool := sorry
+def xorMatch : Bool → Bool → Bool
+  | true, false => true
+  | false, true => true
+  | _, _ => false
 
-example : (xorMatch false false) = false := by sorry
-example : (xorMatch false true)  = true  := by sorry
-example : (xorMatch true  false) = true  := by sorry
-example : (xorMatch true  true)  = false := by sorry
+example : (xorMatch false false) = false := by rfl
+example : (xorMatch false true)  = true  := by rfl
+example : (xorMatch true  false) = true  := by rfl
+example : (xorMatch true  true)  = false := by rfl
 
 
 
