@@ -576,12 +576,15 @@ example : (xorMatch true  true)  = false := by rfl
 __Exercise__: Redefine the NAND connective using pattern matching.
 -/
 
-def nandMatch : Bool → Bool → Bool := sorry
+def nandMatch : Bool → Bool → Bool
+  | true, true => false
+  | _, _ => true
 
-example : (nandMatch false false) = true  := by sorry
-example : (nandMatch false true)  = true  := by sorry
-example : (nandMatch true  false) = true  := by sorry
-example : (nandMatch true  true)  = false := by sorry
+
+example : (nandMatch false false) = true  := by rfl
+example : (nandMatch false true)  = true  := by rfl
+example : (nandMatch true  false) = true  := by rfl
+example : (nandMatch true  true)  = false := by rfl
 
 /-
 
@@ -772,7 +775,11 @@ __Exercise__: Prove that false is a right identity of disjunction.
 -/
 
 theorem or_false_right (b : Bool) : orB b false = b := by
-  sorry
+  simp [orB]
+theorem or_false_right2 (b : Bool) : orB b false = b := by
+  cases b with
+  | true => rfl
+  | false => rfl
 
 /-
 
@@ -814,19 +821,24 @@ Hint: negate an appropriate use of `||`.
 
 -/
 
-def norB (a b : Bool) : Bool :=
-  sorry
+def norB (a b : Bool) : Bool := !(a || b)
 
 example : norB false false = true := by
-  sorry
+  simp [norB]
 
 example : norB true false = false := by
-  sorry
+  simp [norB]
 
 
 theorem nor_commutative (a b : Bool) :
     norB a b = norB b a := by
-  sorry
+    cases a with
+    | true => cases b with
+      | true => rfl
+      | false => rfl
+    | false => cases b with
+      | true => rfl
+      | false => rfl
 
 
 /-
@@ -837,9 +849,12 @@ Prove the following theorem. Hint: split into the two cases for `b`, then use `r
 
 -/
 
+
+
+
 theorem negB_eq_negMatch : ∀ b : Bool,
     negB b = negMatch b := by
-  sorry
+      simp [negB,negMatch]
 
 
 /-
