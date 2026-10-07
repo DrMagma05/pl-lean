@@ -197,11 +197,11 @@ __Exercise__: Note that `rfl` is not powerful enough to prove apparently
 obvious equivalences, like e.g. `n + 1 = 1 + n`. Replace `sorry` with
 `rfl` and check whether the goal is solved.
 -/
-example (n : Nat) : Nat.succ n = 1 + n := by sorry
+example (n : Nat) : Nat.succ n = n + 1 := by sorry
 
 
 /-
-### Built-in arithmetic operators
+### Built-in arithmetic operatorsr
 
 Lean already knows the usual operations on natural numbers.
 -/
@@ -274,8 +274,8 @@ example : Nat.succ (predN 7) = 7 := by rfl
 /-
 __Exercise__: but is this *always* true? If not, provide a counterexample
 -/
-example : let n := sorry                  --- replace this sorry with a natural number
-  !(Nat.succ (predN n) == n) := by sorry   --- once done, replace this sorry with rfl
+example : let n := 0                  --- replace this sorry with a natural number
+  !(Nat.succ (predN n) == n) := by rfl   --- once done, replace this sorry with rfl
 
 /-
 We can define the predecessor a bit more succinctly, using:
@@ -437,10 +437,14 @@ Lean rejects the following definition, because the recursive call is on a
 __Exercise__: Re-define `addN` by using syntactic sugar and equation-style pattern matching.
 -/
 
-def addN₂ : Nat → Nat → Nat := sorry
+def addN₂ : Nat → Nat → Nat :=
+  fun x y => match y with
+  | 0 => x
+  | y'+1 => addN₂ (x+1) y'
 
-example : addN₂ 4 5 = 9 := by sorry
 
+
+example : addN₂ 4 5 = 9 := by rfl
 
 /-
 
@@ -451,10 +455,10 @@ This is one of the main reasons for defining small reusable functions.
 __Exercise__: Define a recursive function `doubleN` that doubles its argument doubleN n = n+n
 -/
 
-def doubleN (n : Nat) : Nat := sorry
+def doubleN (n : Nat) : Nat := addN₂ n n
 
-example : doubleN 0 = 0   := by sorry
-example : doubleN 5 = 10  := by sorry
+example : doubleN 0 = 0   := by rfl
+example : doubleN 5 = 10  := by rfl
 
 
 /-
@@ -501,11 +505,11 @@ Define `isOdd`, which is `true` exactly for the odd numbers.
 You can do it by pattern matching, or by reusing `isEven` together with Boolean negation `!`.
 -/
 
-def isOdd (n : Nat) : Bool := sorry
+def isOdd (n : Nat) : Bool := ! isEven n
 
-example : isOdd 0 = false   := by sorry
-example : isOdd 7 = true    := by sorry
-example : isOdd 10 = false  := by sorry
+example : isOdd 0 = false   := by rfl
+example : isOdd 7 = true    := by rfl
+example : isOdd 10 = false  := by rfl
 
 
 /-
@@ -518,11 +522,13 @@ Exponentiation is repeated multiplication, recursively on the exponent:
 
 -/
 
-def powN (b e : Nat) : Nat := sorry
+def powN (b e : Nat) : Nat := match e with
+| 0 => 1
+| e' + 1 => mulN b (powN b e')
 
-example : powN 2 5 = 32 := by sorry
-example : powN 3 0 = 1  := by sorry
-example : powN 0 3 = 0  := by sorry
+example : powN 2 5 = 32 := by rfl
+example : powN 3 0 = 1  := by rfl
+example : powN 0 3 = 0  := by rfl
 
 
 /-
@@ -535,11 +541,13 @@ The factorial function is defined mathematically by
 
 -/
 
-def fact : Nat → Nat := sorry
+def fact : Nat → Nat := fun x => match x with
+  | 0 => 1
+  | x' +1 => mulN x (fact x')
 
-example : fact 0 = 1   := by sorry
-example : fact 1 = 1   := by sorry
-example : fact 5 = 120 := by sorry
+example : fact 0 = 1   := by rfl
+example : fact 1 = 1   := by rfl
+example : fact 5 = 120 := by rfl
 
 set_option maxRecDepth 2000 in --- to avoid `maximum recursion depth has been reached`
 example : fact 6 = 720 := by sorry
@@ -552,10 +560,10 @@ Define a function `tripleN` that computes three times its argument.
 Reuse `doubleN` and `addN` instead of writing a recursive definition.
 -/
 
-def tripleN (n : Nat) : Nat := sorry
+def tripleN (n : Nat) : Nat := addN (doubleN n) n
 
-example : tripleN 0 = 0  := by sorry
-example : tripleN 4 = 12 := by sorry
+example : tripleN 0 = 0  := by rfl
+example : tripleN 4 = 12 := by rfl
 
 
 /-
@@ -569,11 +577,13 @@ Define a recursive function `sumUpTo` such that `sumUpTo n = 0 + 1 + 2 + ... + n
 You may use Lean's built-in `+` here.
 -/
 
-def sumUpTo (n : Nat) : Nat := sorry
+def sumUpTo (n : Nat) : Nat := match n with
+| 0 => 0
+| n' + 1 => (n' + 1) + sumUpTo n'
 
-example : sumUpTo 0 = 0   := by sorry
-example : sumUpTo 4 = 10  := by sorry
-example : sumUpTo 10 = 55 := by sorry
+example : sumUpTo 0 = 0   := by rfl
+example : sumUpTo 4 = 10  := by rfl
+example : sumUpTo 10 = 55 := by rfl
 
 
 /-
@@ -589,12 +599,15 @@ Observe that this definition has two base cases and *two* recursive calls.
 Lean accepts it because both calls are on smaller arguments.
 -/
 
-def fibN (n : Nat) : Nat := sorry
+def fibN (n : Nat) : Nat := match n with
+| 0 => 0
+| 1 => 1
+| n' + 2 => (fibN n') + (fibN (n'+1) )
 
-example : fibN 0 = 0    := by sorry
-example : fibN 1 = 1    := by sorry
-example : fibN 7 = 13   := by sorry
-example : fibN 10 = 55  := by sorry
+example : fibN 0 = 0    := by rfl
+example : fibN 1 = 1    := by rfl
+example : fibN 7 = 13   := by rfl
+example : fibN 10 = 55  := by rfl
 
 
 end Exercises_on_recursion
@@ -652,11 +665,11 @@ __Exercise__ (`ltN`): define `ltN n m`, which tests whether `n < m`.
 Hint: `n < m` holds exactly when `n + 1 ≤ m`.  Reuse `leN`.
 -/
 
-def ltN (n m : Nat) : Bool := sorry
+def ltN (n m : Nat) : Bool := leN (n+1) m
 
-example : ltN 2 3 = true  := by sorry
-example : ltN 3 3 = false := by sorry
-example : ltN 4 3 = false := by sorry
+example : ltN 2 3 = true  := by rfl
+example : ltN 3 3 = false := by rfl
+example : ltN 4 3 = false := by rfl
 
 end Comparing_natural_numbers
 
@@ -704,9 +717,9 @@ __Exercise__: prove the corresponding theorems for `mulN`:
 * `mulN_succ`: n * (m+1) = n * m + n
 -/
 
-theorem mulN_zero (n : Nat) : mulN n 0 = 0 := by sorry
+theorem mulN_zero (n : Nat) : mulN n 0 = 0 := by rfl
 
-theorem mulN_succ (n m : Nat) : mulN n (m + 1) = addN (mulN n m) n := by sorry
+theorem mulN_succ (n m : Nat) : mulN n (m + 1) = addN (mulN n m) n := by rflsorry
 
 
 end Proofs_by_simplification
