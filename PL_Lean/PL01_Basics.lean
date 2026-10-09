@@ -848,7 +848,7 @@ theorem nor_commutative (a b : Bool) :
 Prove the following theorem. Hint: split into the two cases for `b`, then use `rfl`.
 
 -/
-
+theorem neg_eq_negMatch
 
 
 
