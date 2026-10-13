@@ -90,6 +90,7 @@ program being defined.
 #check false
 #check Bool         --- also types have types!
 
+
 #eval true
 #eval false
 
@@ -194,9 +195,12 @@ def andB (a b : Bool) : Bool :=
 __Exercise__: Define a function `orB` that implements the disjunction connective
 -/
 
-def orB (a b : Bool) : Bool :=
-  sorry
+def orB (a b : Bool) : Bool := a || b
 
+#check orB
+#eval orB true true
+#eval orB false true
+#eval orB false false
 
 /-
 
@@ -239,6 +243,8 @@ theorem andB_commutative_sorry (a b : Bool) : andB a b = andB b a := by sorry
 __Exercise__: Try to replace `sorry` with `rfl`, and see what happens in the Infoview.
 -/
 
+-- theorem andB_commutative_sorry2 (a b : Bool) : (andB a b = andB b a)  := by rfl
+
 /-
 Using `sorry` has several benefits:
 * The incomplete code is accepted, without generating any _error_.
@@ -278,9 +284,9 @@ def mystery : Bool → Bool :=
   For the moment, leave the `sorry` in `mystery_resolved`.
 -/
 
-def mystery₂ : Bool → Bool := sorry
+def mystery₂ : Bool → Bool := fun b => b
 
-theorem mystery_resolved (b: Bool): mystery b = mystery₂ b := by sorry
+theorem mystery_resolved (b: Bool): mystery b = mystery₂ b := by rfl
 
 
 /-
@@ -374,8 +380,12 @@ __Exercise__: the *exclusive or* is true when exactly one input is true.
 Define the connective, and give its truth table through examples.
 -/
 
-def xorB (a b : Bool) : Bool := sorry
+def xorB (a b : Bool) : Bool := (!a && b ) || (a && !b)
 
+example : (xorB false false) = false := by rfl
+example : (xorB false true) = true := by rfl
+example : (xorB true false) = true := by rfl
+example : (xorB true true) = false := by rfl
 
 
 /-
@@ -383,7 +393,13 @@ __Exercise__: the *nand* connective is true when not both inputs are true.
 Define the connective, and give its truth table through examples.
 -/
 
-def nandB (a b : Bool) : Bool := sorry
+def nandB (a b : Bool) : Bool := !(a && b)
+
+
+example : (nandB false false) = true := by rfl
+example : (nandB false true) = true := by rfl
+example : (nandB true false) = true := by rfl
+example : (nandB true true) = false := by rfl
 
 end Boolean_operators
 
@@ -423,42 +439,40 @@ __Exercise__: try to write a conditional expression where the `true` branch eval
 a number, while the `false` branch evaluates to a string.
 Study the error displayed in the Infoview.
 -/
+-- def daraErrore (a : bool) := if a then 2 else "2"
 
 
 /-
 __Exercise__: Redefine the negation using conditional expressions.
 -/
 
-def negIf (b : Bool) : Bool :=
-  sorry
+def negIf (b : Bool) : Bool := if b then false else true
 
-example : negB true  = negIf true  := by sorry
-example : negB false = negIf false := by sorry
+example : negB true  = negIf true  := by rfl
+example : negB false = negIf false := by rfl
 
 /-
 __Exercise__: Redefine the implication connective using conditional expressions.
 -/
 
-def impIf (a b : Bool) : Bool :=
-  sorry
+def impIf (a b : Bool) : Bool := if !a then true else if b then true else false
 
-example : (impIf false false) = true  := by sorry
-example : (impIf false true)  = true  := by sorry
-example : (impIf true  false) = false := by sorry
-example : (impIf true  true)  = true  := by sorry
+example : (impIf false false) = true  := by rfl
+example : (impIf false true)  = true  := by rfl
+example : (impIf true  false) = false := by rfl
+example : (impIf true  true)  = true  := by rfl
 
 
 /-
 __Exercise__: Redefine the XOR connective using conditional expressions.
 -/
 
-def xorIf (a b : Bool) : Bool :=
-  sorry
+def xorIf (a b : Bool) : Bool := if a then !b else b
 
-example : (xorIf false false) = false := by sorry
-example : (xorIf false true)  = true  := by sorry
-example : (xorIf true  false) = true  := by sorry
-example : (xorIf true  true)  = false := by sorry
+example : (xorIf false false) = false := by rfl
+example : (xorIf false true)  = true  := by rfl
+example : (xorIf true  false) = true  := by rfl
+example : (xorIf true  true)  = false := by rfl
 
 
 /-
@@ -466,12 +480,13 @@ __Exercise__: Define a function `majority` that returns true when at least two
 of its three inputs are true.
 -/
 
-def majority (a b c : Bool) : Bool :=
-  sorry
+def majority (a b c : Bool) : Bool := if a && b then true else
+ if a && c then true else
+  if b && c then true else false
 
-example : majority true false true = true   := by sorry
-example : majority false true true = true   := by sorry
-example : majority false true false = false := by sorry
+example : majority true false true = true   := by rfl
+example : majority false true true = true   := by rfl
+example : majority false true false = false := by rfl
 
 
 end Conditional_expressions
@@ -531,24 +546,29 @@ example : andMatch false true = false := by rfl
 __Exercise__: Redefine the implication connective using pattern matching.
 -/
 
-def impMatch : Bool → Bool → Bool := sorry
+def impMatch : Bool → Bool → Bool
+  | true, false => false
+  | _, _ => true
 
-example : (impMatch false false) = true  := by sorry
-example : (impMatch false true)  = true  := by sorry
-example : (impMatch true  false) = false := by sorry
-example : (impMatch true  true)  = true  := by sorry
+example : (impMatch false false) = true  := by rfl
+example : (impMatch false true)  = true  := by rfl
+example : (impMatch true  false) = false := by rfl
+example : (impMatch true  true)  = true  := by rfl
 
 
 /-
 __Exercise__: Redefine the XOR connective using pattern matching.
 -/
 
-def xorMatch : Bool → Bool → Bool := sorry
+def xorMatch : Bool → Bool → Bool
+  | true, false => true
+  | false, true => true
+  | _, _ => false
 
-example : (xorMatch false false) = false := by sorry
-example : (xorMatch false true)  = true  := by sorry
-example : (xorMatch true  false) = true  := by sorry
-example : (xorMatch true  true)  = false := by sorry
+example : (xorMatch false false) = false := by rfl
+example : (xorMatch false true)  = true  := by rfl
+example : (xorMatch true  false) = true  := by rfl
+example : (xorMatch true  true)  = false := by rfl
 
 
 
@@ -556,12 +576,15 @@ example : (xorMatch true  true)  = false := by sorry
 __Exercise__: Redefine the NAND connective using pattern matching.
 -/
 
-def nandMatch : Bool → Bool → Bool := sorry
+def nandMatch : Bool → Bool → Bool
+  | true, true => false
+  | _, _ => true
 
-example : (nandMatch false false) = true  := by sorry
-example : (nandMatch false true)  = true  := by sorry
-example : (nandMatch true  false) = true  := by sorry
-example : (nandMatch true  true)  = false := by sorry
+
+example : (nandMatch false false) = true  := by rfl
+example : (nandMatch false true)  = true  := by rfl
+example : (nandMatch true  false) = true  := by rfl
+example : (nandMatch true  true)  = false := by rfl
 
 /-
 
@@ -752,7 +775,11 @@ __Exercise__: Prove that false is a right identity of disjunction.
 -/
 
 theorem or_false_right (b : Bool) : orB b false = b := by
-  sorry
+  simp [orB]
+theorem or_false_right2 (b : Bool) : orB b false = b := by
+  cases b with
+  | true => rfl
+  | false => rfl
 
 /-
 
@@ -794,19 +821,24 @@ Hint: negate an appropriate use of `||`.
 
 -/
 
-def norB (a b : Bool) : Bool :=
-  sorry
+def norB (a b : Bool) : Bool := !(a || b)
 
 example : norB false false = true := by
-  sorry
+  simp [norB]
 
 example : norB true false = false := by
-  sorry
+  simp [norB]
 
 
 theorem nor_commutative (a b : Bool) :
     norB a b = norB b a := by
-  sorry
+    cases a with
+    | true => cases b with
+      | true => rfl
+      | false => rfl
+    | false => cases b with
+      | true => rfl
+      | false => rfl
 
 
 /-
@@ -816,10 +848,13 @@ theorem nor_commutative (a b : Bool) :
 Prove the following theorem. Hint: split into the two cases for `b`, then use `rfl`.
 
 -/
+theorem neg_eq_negMatch
+
+
 
 theorem negB_eq_negMatch : ∀ b : Bool,
     negB b = negMatch b := by
-  sorry
+      simp [negB,negMatch]
 
 
 /-
