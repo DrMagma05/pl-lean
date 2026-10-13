@@ -719,7 +719,7 @@ __Exercise__: prove the corresponding theorems for `mulN`:
 
 theorem mulN_zero (n : Nat) : mulN n 0 = 0 := by rfl
 
-theorem mulN_succ (n m : Nat) : mulN n (m + 1) = addN (mulN n m) n := by rflsorry
+theorem mulN_succ (n m : Nat) : mulN n (m + 1) = addN (mulN n m) n := by rfl
 
 
 end Proofs_by_simplification
@@ -794,7 +794,7 @@ its second argument.  If you try
     example (n : Nat) : addN 0 n = n := by
       rfl
 
-Lean reports an error.  We need a new idea: reason by *cases* or by *induction*.
+Lean reports an error.  We need a new idea: reasFix typo in mulN_succ theorem proofon by *cases* or by *induction*.
 
 -/
 
