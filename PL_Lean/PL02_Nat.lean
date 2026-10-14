@@ -1181,9 +1181,20 @@ theorem addN_one_right (n : Nat) : addN n 1 = Nat.succ n := by
 Prove the following property. Hint: use existing properties about addN and successors
 -/
 
-theorem addN_self_succ (n : Nat) : addN (n + 1) (n + 1) = addN n n + 1 + 1 := by
-  simp [addN]
 
+--addN_succ_right
+--addN_one_right
+/-
+theorem addN_self_succ (n : Nat) : addN (n + 1) (n + 1) = addN n n + 1 + 1 := by
+  have h : ∀ a b : Nat, addN (a + 1) b = addN a b + 1 := by
+    intro a b
+    cases b with
+    | zero => rfl
+    | succ => cases a with
+      | zero => simp [addN]
+      | succ => rfl
+  rw [addN_succ_right, h n n]
+-/
 
 /-
 ### Exercise: Repeated rewriting
@@ -1194,7 +1205,8 @@ application of `rw`.
 
 theorem addN_two_steps (n m : Nat) :
     addN n (m + 1 + 1) = addN n m + 1 + 1 := by
-  sorry
+  rw [addN_succ_right]
+  rw [addN_succ_right]
 
 
 /-
@@ -1206,7 +1218,8 @@ Rewrite both occurrences of `addN` in `h`, using `addN_zero n` and
 
 theorem addN_zero_cancel (n m : Nat)
     (h : addN n 0 = addN m 0) : n = m := by
-  sorry
+  rw [addN_zero n, addN_zero m] at h
+  exact h
 
 
 /-
