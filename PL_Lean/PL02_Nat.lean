@@ -832,8 +832,9 @@ __Exercise__: Prove in the same way that `isZero n = eqN n 0`.
 -/
 
 theorem isZero_eq_eqN (n : Nat) : isZero n = eqN n 0 := by
-  sorry
-
+cases n with
+| zero => rfl
+| succ => rfl
 
 /-
 ### Case analysis on an equality
@@ -982,14 +983,17 @@ __Exercise__: (`addN_zero_eq`) Use `rw` and `exact` to prove the following prope
 -/
 
 theorem addN_zero_eq (n m : Nat) (h : n = m) : addN n 0 = m := by
-  sorry
+  rw [addN_zero]
+  exact h
 
 /-
 __Exercise__: (`addN_zero_trans`) Prove the following property.
 -/
 
 theorem addN_zero_trans : ∀ a b c : Nat, a = b → b = c → addN a 0 = c := by
-  sorry
+  intros a b c
+  rw [addN_zero]
+  exact eq_trans a b c -- rw e per sostituire exact e per applicare la dim
 
 end Proofs_by_exact
 
@@ -1168,7 +1172,7 @@ section Exercises
 -/
 
 theorem addN_one_right (n : Nat) : addN n 1 = Nat.succ n := by
-  sorry
+  simp [addN]
 
 
 /-
@@ -1178,7 +1182,7 @@ Prove the following property. Hint: use existing properties about addN and succe
 -/
 
 theorem addN_self_succ (n : Nat) : addN (n + 1) (n + 1) = addN n n + 1 + 1 := by
-  sorry
+  simp [addN]
 
 
 /-
