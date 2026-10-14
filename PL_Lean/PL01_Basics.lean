@@ -848,8 +848,12 @@ theorem nor_commutative (a b : Bool) :
 Prove the following theorem. Hint: split into the two cases for `b`, then use `rfl`.
 
 -/
-theorem neg_eq_negMatch
-
+theorem neg_eq_negMatch :  ∀ b : Bool,
+    negB b = negMatch b := by
+    intro b
+    cases b with
+    | true => rfl
+    | false => rfl
 
 
 theorem negB_eq_negMatch : ∀ b : Bool,
@@ -867,7 +871,15 @@ Prove the following theorem.
 
 theorem andB_eq_andMatch : ∀ a b : Bool,
   andB a b = andMatch a b := by
-  sorry
+  intro a
+  intro b
+  cases a with
+  | false => cases b with
+    | false => rfl
+    |true => rfl
+  | true => cases b with
+    | false => rfl
+    |true => rfl
 
 
 /-
@@ -885,6 +897,11 @@ You can put your mouse over them in the Infoview to see what operands Lean
 automatically groups together in the absence of parentheses.
 -/
 
+theorem and_associative (a b c : Bool) : andB a (andB b  c) = andB (andB a b) c := by
+  cases a with
+  | true => simp [andB]
+  | false => simp [andB]
+
 /-
 
 ### Exercise: All three
@@ -894,19 +911,31 @@ First use Boolean operators.  Then try a conditional or pattern matching.
 Finally, show that the two definitions are equivalent.
 -/
 
-def allThree (a b c : Bool) : Bool :=
-  sorry
+def allThree (a b c : Bool) := a && b && c
 
-example : allThree true true true = true := by
-  sorry
+example : allThree true true true = true := by rfl
 
-example : allThree true false true = false := by
-  sorry
+example : allThree true false true = false := by rfl
 
 def allThreeMatch (a b c : Bool) : Bool :=
-  sorry
+  match a with
+  | false => false
+  | true => match b with
+    | false => false
+    | true => match c with
+      | false => false
+      | true => true
 
-example (a b c : Bool) : allThree a b c = allThreeMatch a b c := by sorry
+example (a b c : Bool) : allThree a b c = allThreeMatch a b c := by
+  cases a with
+  | false => rfl
+  | true =>  cases b with
+    | false => rfl
+    | true => cases c with
+      | false => rfl
+      | true => rfl
+
+
 
 
 /-
@@ -919,8 +948,12 @@ It is the Boolean form of one of De Morgan's laws.
 -/
 
 theorem deMorgan_nand (a b : Bool) :
-    !(a && b) = ((!a) || (!b)) :=
-  sorry
+    !(a && b) = ((!a) || (!b)) := by
+    cases a with
+    | true => cases b with
+      | true => rfl
+      | false => rfl
+    | false => rfl
 
 
 /-
@@ -947,15 +980,21 @@ such that `mux4 s1 s0 a0 a1 a2 a3` equals to `ai` if `s1 s0` is the binary encod
 In the implementation of `mux4`, try to reuse `mux2`.
 
 -/
+/-
+def mux2 (s0 a b : Bool) : Bool := match s0 with
+| true => a
+| false => b
+-/
+--def mux2 (s0 a b : Bool) : Bool := s0 && a || (!s0) && b
 
-def mux2 (s0 a b : Bool) : Bool := sorry
+def mux2 (s0 a b : Bool) : Bool := if s0 then a else b
 
-def mux4 (s0 s1 a0 a1 a2 a3 : Bool) : Bool := sorry
+def mux4 (s0 s1 a0 a1 a2 a3 : Bool) : Bool := mux2 s0 (mux2 s1 a3 a2) (mux2 s1 a1 a0)
 
-example : mux4 false false false true false true = false := sorry
-example : mux4 false true false true false true = true   := sorry
-example : mux4 true false false true false true = false  := sorry
-example : mux4 true true false true false true = true    := sorry
+example : mux4 false false false true false true = false := by rfl
+example : mux4 false true false true false true = true   := by rfl
+example : mux4 true false false true false true = false  := by rfl
+example : mux4 true true false true false true = true    := by rfl
 
 
 end Exercises
