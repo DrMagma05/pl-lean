@@ -1230,7 +1230,8 @@ Use `hab` from right to left in the goal, and then use `exact`.
 
 theorem eq_from_common_left (a b c : Nat)
     (hab : a = b) (hac : a = c) : b = c := by
-  sorry
+  rw [hab] at hac
+  exact hac
 
 
 /-
@@ -1241,7 +1242,9 @@ resulting goals can be closed by computation.
 -/
 
 theorem leN_eq_eqN_zero (n : Nat) : leN n 0 = eqN n 0 := by
-  sorry
+  cases n with
+  | zero => rfl
+  | succ => rfl
 
 
 /-
@@ -1251,7 +1254,8 @@ Introduce the equality as a hypothesis and then perform case analysis on it.
 -/
 
 theorem zero_ne_succ (n : Nat) : 0 = Nat.succ n → False := by
-  sorry
+  intros eq
+  cases eq
 
 
 /-
@@ -1263,7 +1267,9 @@ hypotheses `hab` and `hbc`.
 
 theorem eq_trans_apply (a b c : Nat)
     (hab : a = b) (hbc : b = c) : a = c := by
-  sorry
+  apply eq_trans₂ a b c
+  rw [hab]
+  rw [hbc]
 
 
 /-
@@ -1276,7 +1282,11 @@ theorem succ_succ_succ_injective (a b : Nat) :
     Nat.succ (Nat.succ (Nat.succ a)) =
       Nat.succ (Nat.succ (Nat.succ b)) →
     a = b := by
-  sorry
+  intro h
+  apply succN_injective
+  apply succN_injective
+  apply succN_injective
+  exact h
 
 
 /-
@@ -1289,7 +1299,9 @@ First use `have` and `succN_injective` to obtain proofs of `a = b` and
 theorem eq_from_succ_chain (a b c : Nat)
     (hab : Nat.succ a = Nat.succ b)
     (hbc : Nat.succ b = Nat.succ c) : a = c := by
-  sorry
+  have h1 : a = b := succN_injective a b hab --ipotizzo che a=b e lo dimostro usando succN_injective a b e hab
+  have h2 : b = c := succN_injective b c hbc
+  rw [h1,h2]
 
 
 /-
@@ -1301,7 +1313,9 @@ negation.
 
 theorem not_eqN_of_false (a b : Nat) (h : eqN a b = false) :
     !(eqN a b) = true := by
-  sorry
+    simp [h]
+
+
 
 /-
 ### Exercise: Summing up equal numbers
@@ -1309,7 +1323,9 @@ theorem not_eqN_of_false (a b : Nat) (h : eqN a b = false) :
 Solve this by way of rewriting the right theorems or assumptions.
 -/
 
-theorem plus_id : ∀ n m o : Nat, n = m → m = o → n + m = m + o := by sorry
+theorem plus_id : ∀ n m o : Nat, n = m → m = o → n + m = m + o := by
+  intro n m o h1 h2
+  rw [h1,h2]
 
 /-
 ### Exercise: Multiplying by zero
@@ -1317,7 +1333,11 @@ theorem plus_id : ∀ n m o : Nat, n = m → m = o → n + m = m + o := by sorry
 Solve this by way of rewriting the right theorems or assumptions.
 -/
 
-theorem mult_n_0_m_0 : ∀ n m : Nat, addN (mulN n 0) (mulN m 0) = 0 := by sorry
+theorem mult_n_0_m_0 : ∀ n m : Nat, addN (mulN n 0) (mulN m 0) = 0 := by
+  intro n m
+  rw [mulN_zero]
+  rw [mulN_zero]
+  exact addN_zero 0
 
 /-
 ### Exercise: One ain't double
@@ -1325,6 +1345,9 @@ theorem mult_n_0_m_0 : ∀ n m : Nat, addN (mulN n 0) (mulN m 0) = 0 := by sorry
 Hint: you can discharge a contradiction `h` with `cases h`.
 -/
 
-theorem one_not_double : ∀ n, 1 = mulN 2 n → False := by sorry
-
+theorem one_not_double : ∀ n, 1 = mulN 2 n → False := by
+  intro n h
+  cases n with
+  | zero => simp [mulN] at h
+  | succ _ => simp [mulN, addN] at h
 end Exercises
