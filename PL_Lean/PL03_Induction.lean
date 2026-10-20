@@ -132,8 +132,12 @@ the induction hypothesis `ih`.  You can use them with `rw [...]` or inside `simp
 -/
 
 theorem zero_mulN (n : Nat) : mulN 0 n = 0 := by
-  sorry
-
+  induction n with
+  | zero => rfl
+  | succ m' ih =>
+    rw [mulN_succ]
+    rw [addN_zero]
+    exact ih
 
 /-
 ### Exercise: Reflexivity of eqN
@@ -142,7 +146,9 @@ Prove that `eqN` is reflexive. Hint: proceed by induction on `a`, and use the `e
 -/
 
 theorem eqN_refl (a : Nat) : eqN a a = true := by
-  sorry
+  induction a with
+  | zero => rfl
+  | succ a' ih => exact ih
 
 /-
 ### Exercise: Antisymmetricity of leN
@@ -151,7 +157,20 @@ Prove that `leN` is antisymmetric.
 -/
 
 theorem leN_antisymm : ∀ n m, leN n m → leN m n → eqN n m := by
-  sorry
+  intro n
+  induction n with
+  | zero =>
+    intro m hmn hmn2
+    cases m with
+    | zero => rfl
+    | succ m' => simp [leN] at hmn2
+  | succ n' ih =>
+    intro m hmn hmn2
+    cases m with
+    | zero => simp [leN] at hmn
+    | succ m' =>
+      simp [leN] at hmn2
+      exact ih m' hmn hmn2
 
 /-
 ### Exercise: Alternative characterization of even (n + 1)
@@ -161,7 +180,11 @@ Hint: `simp` knows that ! is involutory
 -/
 
 theorem isEven_succ (n: Nat) : isEven (n+1) = !(isEven n) := by
-  sorry
+  induction n with
+  | zero => rfl
+  | succ n' ih =>
+    rw [ih]
+    simp [isEven]
 
 
 /-
@@ -171,7 +194,18 @@ Hint: by induction on `n`.
 -/
 
 theorem isEven_doubleN (n: Nat) : isEven (doubleN n) = true := by
-  sorry
+  induction n with
+  | zero => rfl
+  | succ n' ih =>
+    simp [doubleN]
+    simp [addN]
+    rw [isEven_succ]
+    rw [addN_comm]
+    simp [addN]
+    rw [isEven_succ]
+    rw [<- doubleN]
+    rw [ih]
+    rfl
 
 
 /-
@@ -181,7 +215,8 @@ Hint: by induction on `n`.
 -/
 
 theorem doubleN_addN (n: Nat) : doubleN n = addN n n := by
-  sorry
+  rfl
+
 
 
 /-
@@ -191,8 +226,14 @@ Hint: you don't need explicit induction here.
 -/
 
 theorem doubleN_mulN (n: Nat) : doubleN n = mulN 2 n := by
-  sorry
-
+  induction n with
+  | zero => rfl
+  | succ n' ih =>
+    simp [doubleN, addN]
+    simp [mulN, addN]
+    rw [addN_comm]
+    simp [addN]
+    exact ih
 /-
 ### Exercise: Associativity of addN
 
@@ -203,7 +244,12 @@ Hint: induction on `k`.  In the successor case, unfold the additions with
 -/
 
 theorem addN_assoc (n m k : Nat) : addN (addN n m) k = addN n (addN m k) := by
-  sorry
+  induction k with
+  | zero => rfl
+  | succ k' ih =>
+    rw [addN_succ_right]
+    simp [addN]
+    exact ih
 
 /-
 ### Exercise: A+A=B+B so A=B
@@ -211,7 +257,15 @@ theorem addN_assoc (n m k : Nat) : addN (addN n m) k = addN n (addN m k) := by
 Prove the opposite direction of `addN_id`.
 -/
 
-theorem addN_id' (n m : Nat) : addN n n = addN m m → n = m := by sorry
+theorem addN_id' (n m : Nat) : addN n n = addN m m → n = m := by
+  sorry
+
+
+
+
+
+
+
 
 
 end Exercises

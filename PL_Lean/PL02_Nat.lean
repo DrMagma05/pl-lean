@@ -455,7 +455,7 @@ This is one of the main reasons for defining small reusable functions.
 __Exercise__: Define a recursive function `doubleN` that doubles its argument doubleN n = n+n
 -/
 
-def doubleN (n : Nat) : Nat := addN₂ n n
+def doubleN (n : Nat) : Nat := addN n n
 
 example : doubleN 0 = 0   := by rfl
 example : doubleN 5 = 10  := by rfl
