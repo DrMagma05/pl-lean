@@ -713,8 +713,8 @@ theorem addN_succ_right (n m : Nat) : addN n (m + 1) = (addN n m) + 1 := by rfl
 
 /-
 __Exercise__: prove the corresponding theorems for `mulN`:
-* `mulN_zero`: n * 0 = 0;
-* `mulN_succ`: n * (m+1) = n * m + n
+* `mulN_zero_right`: n * 0 = 0;
+* `mulN_succ_right`: n * (m+1) = n * m + n
 -/
 
 theorem mulN_zero (n : Nat) : mulN n 0 = 0 := by rfl
@@ -1314,6 +1314,7 @@ negation.
 theorem not_eqN_of_false (a b : Nat) (h : eqN a b = false) :
     !(eqN a b) = true := by
     simp [h]
+
 
 
 
