@@ -443,27 +443,32 @@ theorem mulN_addN_distrib_left (a b c : Nat) : mulN a (addN b c) = addN (mulN a 
   | zero =>
     rfl
   | succ c' ih=>
-    simp[addN_succ_right]
-    simp [mulN]
-    sorry
-
-
-
+    rw [addN_succ_right]
+    simp [mulN_succ_right]
+    rw [ih]
+    rw [addN_assoc]
 /-
 #### Optional challenge: choose a less convenient induction variable
 
-**Difficulty: 4/4.**
+**Difficulty: 4s/4.**
 
 The following proof establishes the same result by induction on `a`.  This
-choice is valid, but it needs substantially more algebraic rearrangement.  It
+choice is valid, but it simp [mulN_succ_left]
+      rw [ih]
+      simp [<- mulN_addN_distrib_left]
+      simp [addN_assoc, mulN_comm]needs substantially more algebraic rearrangement.  It
 illustrates why choosing the variable that controls the stuck recursive
 definition usually leads to a clearer proof.
 -/
 
 theorem mulN_addN_distrib_left_by_first_arg (a b c : Nat) :
     mulN a (addN b c) = addN (mulN a b) (mulN a c) := by
-  sorry
-
+    induction a with
+    | zero =>
+      simp [mulN_zero_left]
+      rfl
+    | succ a' ih=>
+      rw [mulN_addN_distrib_left]
 
 /-
 ### Exercise: Associativity of mulN
@@ -476,7 +481,13 @@ Hint: in the inductive case, exploit `mulN_addN_distrib_left`.
 -/
 
 theorem mulN_assoc (n m k : Nat) : mulN (mulN n m) k = mulN n (mulN m k) := by
-  sorry
+  induction k with
+  | zero => rfl
+  | succ k' ih=>
+    simp [mulN_comm,mulN_succ_right,mulN_addN_distrib_left]
+    simp [addN_comm]
+    rw [<- ih]
+    simp [mulN_comm]
 
 
 /-
@@ -489,7 +500,10 @@ Prove that `eqN` is reflexive.  Hint: proceed by induction on `a`, and use the
 -/
 
 theorem eqN_refl (a : Nat) : eqN a a = true := by
-  sorry
+  induction a with
+  | zero => rfl
+  | succ a' ih=>
+    exact ih
 
 
 /-
@@ -508,7 +522,10 @@ def leN : Nat → Nat → Bool
 -/
 
 theorem leN_refl (n : Nat) : leN n n = true := by
-  sorry
+  induction n with
+  | zero => rfl
+  | succ n' ih=>
+    exact ih
 
 
 /-
@@ -610,7 +627,15 @@ Hint: induction on `b` generalizing `a`. In the inductive case,
 do case-analysis on `a`.
 -/
 theorem leN_succ_left (a b : Nat) : leN (a + 1) b = true → leN a b = true := by
-  sorry
+  intro h
+  induction b generalizing a with
+  | zero => rfl
+  | succ b' ih =>cases a with
+    | zero => rfl
+    | succ a' =>
+      rw [leN]
+      rw [leN] at h
+      exact ih a' h
 
 /-
 ### Exercise: Antisymmetricity of leN
