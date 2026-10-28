@@ -73,11 +73,11 @@ Products can also be **nested**, and functions may return pairs.
 /- __Exercise (difficulty: 1/4)__ Construct values of the given types.
 Notice where the parentheses occur. -/
 
-example : Nat × Nat           := sorry
-example : (Nat × Bool) × Nat  := sorry
-example : Nat × (Bool × Nat)  := sorry
-example : Nat → (Nat × Nat)   := sorry
-example : Nat → (Nat × Bool)  := sorry
+example : Nat × Nat           := (2,2)
+example : (Nat × Bool) × Nat  := ((200,true),2)
+example : Nat × (Bool × Nat)  := (2,(true,200))
+example : Nat → (Nat × Nat)   := λ x => (x,2)
+example : Nat → (Nat × Bool)  := λ x => (x,false)
 
 /-
 Parentheses matter. In general,
@@ -121,14 +121,12 @@ example : swapNatBool (0, false) = (false, 0) := by rfl
 
 /- __Exercise (difficulty: 1/4)__ Define the following functions using projections. -/
 
-def sumComponents (p : Nat × Nat) : Nat :=
-  sorry
+def sumComponents (p : Nat × Nat) : Nat := p.1 + p.2
 
-def keepFirstAndDoubleSecond (p : Nat × Nat) : Nat × Nat :=
-  sorry
+def keepFirstAndDoubleSecond (p : Nat × Nat) : Nat × Nat := (p.1,p.2*2)
 
-example : sumComponents (3, 4) = 7                  := by sorry
-example : keepFirstAndDoubleSecond (3, 4) = (3, 8)  := by sorry
+example : sumComponents (3, 4) = 7                  := by rfl
+example : keepFirstAndDoubleSecond (3, 4) = (3, 8)  := by rfl
 
 end Projections
 
@@ -157,21 +155,21 @@ example (p : Nat × Bool): swapNatBool₂ p  = swapNatBool p := by rfl
 /- __Exercise (difficulty: 1/4)__ Define the following functions using pattern matching. -/
 
 def addPair : Nat × Nat → Nat
-  := sorry
+  := λ (x,y) => x + y
 
 def mulPair : Nat × Nat → Nat
-  := sorry
+  := λ (x,y) => x * y
 
-example : addPair (3, 4) = 7  := by sorry
-example : mulPair (3, 4) = 12 := by sorry
+example : addPair (3, 4) = 7  := by rfl
+example : mulPair (3, 4) = 12 := by rfl
 
 /- __Exercise (difficulty: 1/4)__ The Boolean component chooses which number to return. -/
 
 def chooseFromPair : (Nat × Nat) × Bool → Nat
-  := sorry
+  := λ ((x,y),z) => if z then x else y
 
-example : chooseFromPair ((10, 20), true)  = 10 := by sorry
-example : chooseFromPair ((10, 20), false) = 20 := by sorry
+example : chooseFromPair ((10, 20), true)  = 10 := by rfl
+example : chooseFromPair ((10, 20), false) = 20 := by rfl
 
 end Pattern_matching
 
@@ -200,12 +198,12 @@ Then, prove that applying `rev4` twice is the identity function.
 -/
 
 def rev4: Nat × Nat × Nat × Nat → Nat × Nat × Nat × Nat
-  := sorry
+  := λ (a,b,c,d) => (d,c,b,a)
 
-example : rev4 (1,2,3,4) = (4,3,2,1) := by sorry
+example : rev4 (1,2,3,4) = (4,3,2,1) := by rfl
 
 theorem rev4_rev4_equiv_id4 : ∀ t : Nat × Nat × Nat × Nat, rev4 (rev4 t) = t := by
-  sorry
+  simp [rev4]
 
 /-
 We can use pattern matching also on nested pairs. As usual, the wildcard `_` can match everything.
@@ -224,12 +222,14 @@ example : addTwoPairs ((1, 2), (3, 4)) = 10 := by rfl
 -/
 
 def minOrMax : (Nat × Nat) × Bool → Nat
-  := sorry
+  := λ p => match p with
+  | ((n,m),false) => if n>m then m else n
+  | ((n,m),true) => if n>m then n else m
 
-example : minOrMax ((1, 2), false) = 1 := by sorry
-example : minOrMax ((3, 2), false) = 2 := by sorry
-example : minOrMax ((1, 3), true)  = 3 := by sorry
-example : minOrMax ((4, 2), true)  = 4 := by sorry
+example : minOrMax ((1, 2), false) = 1 := by rfl
+example : minOrMax ((3, 2), false) = 2 := by rfl
+example : minOrMax ((1, 3), true)  = 3 := by rfl
+example : minOrMax ((4, 2), true)  = 4 := by rfl
 
 end Tuples
 
@@ -247,18 +247,18 @@ applies two computations to the same input and returns both results.
 def bothResultsN (f g : Nat → Nat) (n : Nat) : Nat × Nat :=
   (f n, g n)
 
-example : bothResultsN Nat.succ (Nat.pred) 2 = (1,3) := sorry
-example : bothResultsN Nat.succ (fun n => n+n) 5 = sorry := sorry
+example : bothResultsN Nat.succ (Nat.pred) 2 = (3,1) := by rfl
+example : bothResultsN Nat.succ (fun n => n+n) 5 = (6,10) := by rfl
 
 /- __Exercise (difficulty: 1/4)__ Define a function `minMax` that takes as input two numbers,
 and returns a pair where the left element is the smaller input and right element if the the larger input. -/
 
 def minMax (a b : Nat) : Nat × Nat :=
-  sorry
+  if a>b then (b,a) else (a,b)
 
-example : minMax 3 8 = (3, 8) := by sorry
-example : minMax 8 3 = (3, 8) := by sorry
-example : minMax 4 4 = (4, 4) := by sorry
+example : minMax 3 8 = (3, 8) := by rfl
+example : minMax 8 3 = (3, 8) := by rfl
+example : minMax 4 4 = (4, 4) := by rfl
 
 end Functions_returning_pairs
 
@@ -284,13 +284,13 @@ def emptyTuple : Unit := ()
 /- __Exercise (difficulty: 1/4)__ Prove that type `Unit` is inhabited. -/
 
 theorem unit_inhabited : ∃ x : Unit, x = () := by
-  sorry
+  exists ()
 
 /- __Exercise (difficulty: 1/4)__ Prove that two elements of type `Unit` must be identical.
 Hint: by case analysis. -/
 
 theorem unit_unique (x y : Unit) : x = y := by
-  sorry
+  rfl
 
 /-
 __Exercise (difficulty: 1/4)__ Show that pairing a number with `()` adds no information.
@@ -300,17 +300,15 @@ Split the proof in 3 parts:
 3. Prove that the composition of the two functions is the identity.
 -/
 
-def removeUnitRight (p : Nat × Unit) : Nat :=
-  sorry
+def removeUnitRight (p : Nat × Unit) : Nat := p.1
 
-def addUnitRight (n : Nat) : Nat × Unit :=
-  sorry
+def addUnitRight (n : Nat) : Nat × Unit := (n,())
 
 theorem remove_comp_add_id (n : Nat): removeUnitRight (addUnitRight n) = n := by
-  sorry
+  rfl
 
 theorem add_comp_remove_id (p : Nat × Unit): addUnitRight (removeUnitRight p) = p := by
-  sorry
+  rfl
 
 end Unit_type
 
@@ -447,10 +445,10 @@ def swapBoolNat : Bool × Nat → Nat × Bool
 /- __Exercise (difficulty: 1/4)__ Prove both round trips. -/
 
 theorem swapBoolNat_comp_swapNatBool_id (p : Nat × Bool) : swapBoolNat (swapNatBool p) = p := by
-  sorry
+  rfl
 
 theorem swapNatBool_comp_swapBoolNat_id (p : Bool × Nat) : swapNatBool (swapBoolNat p) = p := by
-  sorry
+  rfl
 
 end Type_isomorphisms
 
@@ -510,10 +508,10 @@ example : uncurryN (fun (n m : Nat) => n + m)          (3, 4) = 7 := by rfl
 /- __Exercise (difficulty: 1/4)__ Prove the type isomorphism. -/
 
 theorem curryN_uncurryN (f : Nat → Nat → Nat) : curryN (uncurryN f) = f := by
-  sorry
+  rfl
 
 theorem uncurryN_curryN (f : Nat × Nat → Nat) : uncurryN (curryN f) = f := by
-  sorry
+  rfl
 
 end Currying
 
