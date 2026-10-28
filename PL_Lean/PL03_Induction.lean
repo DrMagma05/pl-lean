@@ -292,109 +292,9 @@ hints you use.
 This does not require induction.  Use `addN_succ_right` and `addN_succ_left`.
 -/
 
-theorem zero_mulN (n : Nat) : mulN 0 n = 0 := by
-  induction n with
-  | zero => rfl
-  | succ m' ih =>
-    rw [mulN_succ]
-    rw [addN_zero]
-    exact ih
+theorem addN_self_succ (n : Nat) : addN (n + 1) (n + 1) = addN n n + 1 + 1 := by
+  simp [addN_succ_left,addN_succ_right]
 
-/-
-### Exercise: Reflexivity of eqN
-
-Prove that `eqN` is reflexive. Hint: proceed by induction on `a`, and use the `exact` tactic.
--/
-
-theorem eqN_refl (a : Nat) : eqN a a = true := by
-  induction a with
-  | zero => rfl
-  | succ a' ih => exact ih
-
-/-
-### Exercise: Antisymmetricity of leN
-
-Prove that `leN` is antisymmetric.
--/
-
-theorem leN_antisymm : ∀ n m, leN n m → leN m n → eqN n m := by
-  intro n
-  induction n with
-  | zero =>
-    intro m hmn hmn2
-    cases m with
-    | zero => rfl
-    | succ m' => simp [leN] at hmn2
-  | succ n' ih =>
-    intro m hmn hmn2
-    cases m with
-    | zero => simp [leN] at hmn
-    | succ m' =>
-      simp [leN] at hmn2
-      exact ih m' hmn hmn2
-
-/-
-### Exercise: Alternative characterization of even (n + 1)
-
-Prove that `isEven (n+1)` is true if and only if `isEven n` is false.
-Hint: `simp` knows that ! is involutory
--/
-
-theorem isEven_succ (n: Nat) : isEven (n+1) = !(isEven n) := by
-  induction n with
-  | zero => rfl
-  | succ n' ih =>
-    rw [ih]
-    simp [isEven]
-
-
-/-
-### Exercise: Doubled numbers are even
-
-Hint: by induction on `n`.
--/
-
-theorem isEven_doubleN (n: Nat) : isEven (doubleN n) = true := by
-  induction n with
-  | zero => rfl
-  | succ n' ih =>
-    simp [doubleN]
-    simp [addN]
-    rw [isEven_succ]
-    rw [addN_comm]
-    simp [addN]
-    rw [isEven_succ]
-    rw [<- doubleN]
-    rw [ih]
-    rfl
-
-
-/-
-### Exercise: Double and addition
-
-Hint: by induction on `n`.
--/
-
-theorem doubleN_addN (n: Nat) : doubleN n = addN n n := by
-  rfl
-
-
-
-/-
-### Exercise: Double and multiplication
-
-Hint: you don't need explicit induction here.
--/
-
-theorem doubleN_mulN (n: Nat) : doubleN n = mulN 2 n := by
-  induction n with
-  | zero => rfl
-  | succ n' ih =>
-    simp [doubleN, addN]
-    simp [mulN, addN]
-    rw [addN_comm]
-    simp [addN]
-    exact ih
 /-
 ### Exercise: Associativity of addN
 
@@ -425,14 +325,13 @@ Hint: induct on `n`.  In the successor case, rewrite with
 holds by computation.
 -/
 
-theorem addN_id' (n m : Nat) : addN n n = addN m m → n = m := by
-  sorry
-
-
-
-
-
-
+theorem mulN_zero_left (n : Nat) : mulN 0 n = 0 := by
+  induction n with
+  | zero => rfl
+  | succ n' ih=>
+    rw [mulN_succ_right]
+    rw [ih]
+    rfl
 
 
 
@@ -450,7 +349,12 @@ hypothesis.  The remaining equality follows by computation.
 #check mulN_succ_right
 
 theorem mulN_one_left (n : Nat) : mulN 1 n = n := by
-  sorry
+    induction n with
+    | zero => rfl
+    | succ n' ih =>
+      rw [mulN_succ_right]
+      rw [ih]
+      rfl
 
 
 /-
@@ -486,7 +390,13 @@ Infoview.  The proof has three phases.
 -/
 
 theorem mulN_succ_left (n m : Nat) : mulN (n + 1) m = addN (mulN n m) m := by
-  sorry
+  induction m with
+  | zero => rfl
+  | succ m' ih =>
+    simp [mulN_succ_right]
+    simp [ih]
+    simp [addN_succ_right,addN_assoc]
+    rw [addN_comm m' n]
 
 
 /-
@@ -500,9 +410,15 @@ Hint: in the inductive case, exploit `mulN_succ_right` and `mulN_succ_left`.
 -/
 
 theorem mulN_comm (n m : Nat) : mulN n m = mulN m n := by
-  sorry
-
-
+  induction n with
+  | zero => induction m with
+    | zero => rfl
+    | succ m' ih=>
+      simp [mulN_succ_left,mulN_succ_right]
+      rw [ih]
+  | succ n' ih =>
+    simp [mulN_succ_left,mulN_succ_right]
+    rw [ih]
 /-
 ### Exercise: Multiplication distributes over addition (left)
 
@@ -523,7 +439,14 @@ and `mulN` can then unfold.  So the natural choice is induction on `c`.
 -/
 
 theorem mulN_addN_distrib_left (a b c : Nat) : mulN a (addN b c) = addN (mulN a b) (mulN a c) := by
-  sorry
+  induction c with
+  | zero =>
+    rfl
+  | succ c' ih=>
+    simp[addN_succ_right]
+    simp [mulN]
+    sorry
+
 
 
 /-
