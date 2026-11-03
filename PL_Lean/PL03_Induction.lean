@@ -767,13 +767,6 @@ theorem evalBExp_dual (t : BExp) :
     | true =>
       simp [dualBExp,evalBExp,h,ih]
       exact ih1
-
-
-
-
-
-
-
 /-
 ### Exercise (long): Boolean connectives
 
@@ -811,15 +804,20 @@ inductive BExpConn where
 /-
 __Exercise (difficulty 1/4):__ Define the evaluation function for `BExpConn`.
 -/
-def evalBExpConn : BExpConn → Bool := sorry
+def evalBExpConn : BExpConn → Bool := λ x =>
+  match x with
+  | .btrue    => true
+  | .bnot y   => !(evalBExpConn y)
+  | .band y z => (evalBExpConn y) && (evalBExpConn z)
+  | .bor  y z => (evalBExpConn y) || (evalBExpConn z)
 
 example :
     let ex0 := .band (.bor (.bnot .btrue) .btrue) .btrue
-    evalBExpConn ex0 = true := by sorry
+    evalBExpConn ex0 = true := by rfl
 
 example :
     let ex1 := .band (.bor (.bnot .btrue) .btrue) (.bnot .btrue)
-    evalBExpConn ex1 = false := by sorry
+    evalBExpConn ex1 = false := by rfl
 
 /-
 Every connective can be expressed with a conditional:
@@ -832,18 +830,23 @@ __Exercise (difficulty 2/4):__ Define a function `bexpconn_to_bexp` that transla
 `BExpConn` terms into `BExp` terms, following the intuition above.
 -/
 
-def bexpconn_to_bexp : BExpConn → BExp := sorry
+def bexpconn_to_bexp : BExpConn → BExp := λ x =>
+  match x with
+  | .btrue    => .btrue
+  | .bnot a   => .bifte (bexpconn_to_bexp a) .bfalse .btrue
+  | .band a b => .bifte (bexpconn_to_bexp a) (bexpconn_to_bexp b) .bfalse
+  | .bor  a b => .bifte (bexpconn_to_bexp a) .btrue (bexpconn_to_bexp b)
 
 
 -- __Exercise (difficulty 1/4):__ Test the translation on the two examples above.
 
 example :
     let ex0 := .band (.bor (.bnot .btrue) .btrue) .btrue
-    evalBExpConn ex0 = evalBExp (bexpconn_to_bexp ex0) := by sorry
+    evalBExpConn ex0 = evalBExp (bexpconn_to_bexp ex0) := by rfl
 
 example :
     let ex1 := .band (.bor (.bnot .btrue) .btrue) (.bnot .btrue)
-    evalBExpConn ex1 = evalBExp (bexpconn_to_bexp ex1) := by sorry
+    evalBExpConn ex1 = evalBExp (bexpconn_to_bexp ex1) := by rfl
 
 /-
 __Exercise (difficulty 3/4):__ Prove that the translation preserves the meaning:
@@ -858,7 +861,13 @@ equation for `e`, allowing the surrounding conditional to compute.
 -/
 
 theorem bexpconn_equiv_bexp (t : BExpConn) : evalBExpConn t = evalBExp (bexpconn_to_bexp t) := by
-  sorry
+  induction t with
+  | btrue            => rfl
+  | bnot _   ih      => simp [evalBExpConn,evalBExp,bexpconn_to_bexp,ih]
+  | bor  _ _ ih ih₁  => simp [evalBExpConn,evalBExp,bexpconn_to_bexp,ih,ih₁]
+  | band _ _ ih ih₁  => simp [evalBExpConn,evalBExp,bexpconn_to_bexp,ih,ih₁]
+
+
 
 end Exercises
 
@@ -931,9 +940,14 @@ def twentyfour := six'.b0.b0
 Write a function `binToNat` that converts a `BinNat` into a `Nat`.
 -/
 
-def binToNat : BinNat → Nat := sorry
+def binToNat : BinNat → Nat := λ x =>
+  match x with
+  | .bz => 0
+  | .b0 y => 2*(binToNat y)
+  | .b1 y => 2*(binToNat y)+1
 
-example : binToNat bz.b1.b1.b0 = 6 := by sorry
+
+example : binToNat bz.b1.b1.b0 = 6 := by rfl
 
 
 /-
@@ -947,9 +961,14 @@ Write a function `binIncr` that adds one *directly on numerals*, as in a binary 
 * a numeral ending in `1` becomes `0` and *carries* to the rest.
 -/
 
-def binIncr : BinNat → BinNat := sorry
+def binIncr : BinNat → BinNat := λ x =>
+  match x with
+  | .bz => .b1 .bz
+  | .b0 n => .b1 n
+  | .b1 n => .b0 (binIncr n)
 
-example : binToNat (binIncr bz.b1.b1.b0) = 7 := by sorry
+
+example : binToNat (binIncr bz.b1.b1.b0) = 7 := by rfl
 
 /-
 ### Task 3: Converting natural to binary
@@ -960,10 +979,13 @@ Write a function `natToBin` that converts a `Nat` into a `BinNat`
 by counting up from zero.
 -/
 
-def natToBin : Nat → BinNat := sorry
+def natToBin : Nat → BinNat := λ x =>
+  match x with
+  | 0 => .bz
+  | x' + 1 => binIncr (natToBin x')
 
-example : natToBin 6 = bz.b1.b1.b0 := by sorry
-example : natToBin 11 = bz.b1.b0.b1.b1 := by sorry
+example : natToBin 6 = bz.b1.b1.b0 := by rfl
+example : natToBin 11 = bz.b1.b0.b1.b1 := by rfl
 
 
 /-
@@ -985,7 +1007,7 @@ Prove that the diagram *commutes*, that is the two paths to b' are equivalent.
 -/
 
 theorem natToBin_succ (n : Nat) : natToBin (n + 1) = binIncr (natToBin n) := by
-  sorry
+  rfl
 
 
 /-
@@ -1001,11 +1023,14 @@ converting to `Nat`.  Zero must stay `bz` (we do not want a leading zero digit):
     binDouble (b1 n) = b0 (b1 n)
 -/
 
-def binDouble : BinNat → BinNat := sorry
+def binDouble : BinNat → BinNat := λ x =>
+  match x with
+  | .bz => .bz
+  | t => .b0 t
 
-example : binDouble .bz = .bz := by sorry
-example : binDouble (.b1 .bz) = .b0 (.b1 .bz) := by sorry
-example : binToNat (binDouble (.b1 (.b1 .bz))) = 6 := by sorry
+example : binDouble .bz = .bz := by rfl
+example : binDouble (.b1 .bz) = .b0 (.b1 .bz) := by rfl
+example : binToNat (binDouble (.b1 (.b1 .bz))) = 6 := by rfl
 
 
 /-
@@ -1019,7 +1044,11 @@ Hint: no induction is needed.  There are three constructors, so use `cases`.
 
 theorem binToNat_binDouble (b : BinNat) :
     binToNat (binDouble b) = 2 * binToNat b := by
-  sorry
+    cases b with
+    | bz => rfl
+    | b0 b' => rfl
+    | b1 b' => rfl
+
 
 /-
 ### Task 7: Correctness of binary increment (2)
