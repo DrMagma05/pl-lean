@@ -629,13 +629,17 @@ do case-analysis on `a`.
 theorem leN_succ_left (a b : Nat) : leN (a + 1) b = true → leN a b = true := by
   intro h
   induction b generalizing a with
-  | zero => rfl
+  | zero =>
+    cases a with
+    | zero => rfl
+    | succ a'  => cases h
   | succ b' ih =>cases a with
     | zero => rfl
     | succ a' =>
       rw [leN]
       rw [leN] at h
       exact ih a' h
+
 
 /-
 ### Exercise: Antisymmetricity of leN
@@ -655,8 +659,19 @@ quantified.
 -/
 
 theorem leN_antisymm : ∀ n m, leN n m → leN m n → eqN n m := by
-  sorry
-
+  intro n
+  intro m
+  induction n generalizing m with
+  | zero =>
+    cases m with
+    | zero => simp [leN,eqN]
+    | succ m' => simp [leN,eqN]
+  | succ n' ih=>
+    cases m with
+    | zero => simp [leN,eqN]
+    | succ m' =>
+      intro h₁ h₂
+      exact ih m' h₁ h₂
 
 /-
 ### Exercise: Subtracting a number from itself
@@ -674,7 +689,9 @@ def subN : Nat → Nat → Nat
 -/
 
 theorem subN_self (n : Nat) : subN n n = 0 := by
-  sorry
+  induction n with
+  | zero => rfl
+  | succ n' ih=> simp [subN,ih]
 
 
 /-
@@ -687,8 +704,9 @@ Hint: `simp` knows that `!` is involutive.
 -/
 
 theorem isEven_succ (n: Nat) : isEven (n+1) = !(isEven n) := by
-  sorry
-
+  induction n with
+  | zero => rfl
+  | succ n' ih=> simp [isEven,ih]
 
 /-
 ### Exercise: Doubled numbers are even
@@ -699,8 +717,12 @@ Hint: by induction on `n`.
 -/
 
 theorem isEven_doubleN (n: Nat) : isEven (doubleN n) := by
-  sorry
-
+  induction n with
+  | zero => rfl
+  | succ n' ih=>
+    simp [doubleN,addN,addN,addN_succ_left,isEven_succ]
+    simp [doubleN] at ih
+    rw [ih]
 
 /-
 ### Exercise: Double and addN
@@ -712,7 +734,7 @@ hypothesis, `addN_succ_right`, and `addN_succ_left`.
 -/
 
 theorem doubleN_addN (n: Nat) : doubleN n = addN n n := by
-  sorry
+  simp [doubleN]
 
 
 /-
@@ -734,7 +756,19 @@ After the case split, both sides compute to the same Boolean expression, so
 
 theorem evalBExp_dual (t : BExp) :
     evalBExp (dualBExp t) = !(evalBExp t) := by
-  sorry
+  induction t with
+  | btrue => rfl
+  | bfalse => rfl
+  | bifte t0 t1 t2 ih ih1 ih2=>
+    cases h : evalBExp t0 with
+    | false =>
+      simp [dualBExp,evalBExp,h,ih]
+      exact ih2
+    | true =>
+      simp [dualBExp,evalBExp,h,ih]
+      exact ih1
+
+
 
 
 /-
