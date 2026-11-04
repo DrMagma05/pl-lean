@@ -1076,8 +1076,12 @@ does not replace the induction.
 
 theorem binToNat_binIncr (b : BinNat) :
     binToNat (binIncr b) = binToNat b + 1 := by
-  sorry
-
+    induction b with
+    | bz => rfl
+    | b0 _ => rfl
+    | b1 _ =>
+      simp [binToNat,binIncr]
+      omega
 
 /-
 ### Task 8: Converting a number to binary and back
@@ -1092,8 +1096,9 @@ Hint: induction on `n`.  The successor case needs `natToBin_succ`,
 -/
 
 theorem binToNat_natToBin (n : Nat) : binToNat (natToBin n) = n := by
-  sorry
-
+  induction n with
+  | zero => rfl
+  | succ n' ih=> rw [natToBin_succ,binToNat_binIncr, ih]
 
 /-
 ### Task 9: Normalizing a binary number
@@ -1161,8 +1166,10 @@ Hint: induction not necessary, simplify by the definitions `binDouble` and `binI
 -/
 theorem binIncr_binDouble (b : BinNat) :
     binDouble (binIncr b) = binIncr (binIncr (binDouble b)) := by
-  sorry
-
+  cases b with
+  | bz => rfl
+  | b0 _ => simp [binIncr,binDouble]
+  | b1 _ => simp [binIncr,binDouble]
 
 /-
 #### Sub-task 2 - Difficulty: 3/4 (standard induction and linear algebra).
@@ -1176,8 +1183,11 @@ and `natToBin`, then rewrite with the IH and `binIncr_binDouble`.
 -/
 theorem binDouble_binToNat (n : Nat) :
     binDouble (natToBin n) = natToBin (2 * n) := by
-  sorry
-
+  induction n with
+  | zero => rfl
+  | succ n' ih=>
+    simp [binIncr_binDouble,natToBin,Nat.mul_succ]
+    rw [ih]
 
 /-
 #### Sub-task 3 - Difficulty: 2/4 (standard induction).
@@ -1190,7 +1200,11 @@ This will help you prove one of the inductive cases of the boss theorem.
 
 theorem binDouble_hasLeadingZeros (b : BinNat) :
     hasLeadingZeros (binDouble b) = hasLeadingZeros b := by
-  sorry
+  cases b with
+  | bz => rfl
+  | b0 _ => rfl
+  | b1 _ => rfl
+
 
 
 /-
@@ -1213,7 +1227,31 @@ Hints:
 
 theorem normalize_smallest (b : BinNat) :
     hasLeadingZeros (normalize b) = false := by
-  sorry
-
-
+  induction b with
+  | bz => rfl
+  | b0 _ ih=>
+    simp [normalize,binToNat,
+    <- binDouble_binToNat,
+    binDouble_hasLeadingZeros]
+    rw [<- normalize]
+    exact ih
+  | b1 b' ih =>
+    --binDouble_hasLeadingZeros binDouble_binToNat
+    --hasLeadingZeros binToNat_natToBin binToNat_binIncr
+    --binToNat_binDouble binDouble
+    --
+    simp [normalize,binToNat,
+    <- binDouble_binToNat,natToBin]
+    rw [<- normalize]
+    cases h :(normalize b') with
+    | bz => rfl
+    | b0 =>
+      simp [binDouble,binIncr,hasLeadingZeros]
+      rw [<- h]
+      exact ih
+    | b1 =>
+      simp [binDouble,binIncr]
+      rw [<- h]
+      simp [hasLeadingZeros]
+      exact ih
 end Binary_numbers
