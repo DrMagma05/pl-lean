@@ -734,8 +734,12 @@ __Exercise (difficulty: 1/4)__ Prove theorem `repeatAdd_succ_left`. Hint: you do
 -/
 
 theorem repeatAdd_succ_left (a b c : Nat) : repeatAdd (a+1) b c = addN (repeatAdd a b c) b := by
-  simp [repeatAdd]
-  sorry
+  simp [repeatAdd, addN_comm]
+
+
+
+
+
 /-
 __Exercise (difficulty: 2/4)__ Prove the following equivalence between `repeatAdd` and `mulN`.
 -/
