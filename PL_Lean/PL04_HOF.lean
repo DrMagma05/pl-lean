@@ -733,12 +733,18 @@ example : repeatAdd 0 5 10 = 10 := by rfl
 __Exercise (difficulty: 1/4)__ Prove theorem `repeatAdd_succ_left`. Hint: you do not need induction.
 -/
 
+
+--REPETADD B + RE
+
 theorem repeatAdd_succ_left (a b c : Nat) : repeatAdd (a+1) b c = addN (repeatAdd a b c) b := by
   simp [repeatAdd, addN_comm]
-
-
-
-
+  have h (x y :Nat) : addN x y = x+y := by
+    induction x with
+    | zero => simp [addN_comm,addN]
+    | succ x' ih=>
+      simp [addN_succ_left,ih,Nat.add_comm]
+      rfl
+  simp [h]
 
 /-
 __Exercise (difficulty: 2/4)__ Prove the following equivalence between `repeatAdd` and `mulN`.
