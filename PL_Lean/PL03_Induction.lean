@@ -1236,10 +1236,6 @@ theorem normalize_smallest (b : BinNat) :
     rw [<- normalize]
     exact ih
   | b1 b' ih =>
-    --binDouble_hasLeadingZeros binDouble_binToNat
-    --hasLeadingZeros binToNat_natToBin binToNat_binIncr
-    --binToNat_binDouble binDouble
-    --
     simp [normalize,binToNat,
     <- binDouble_binToNat,natToBin]
     rw [<- normalize]
