@@ -148,6 +148,7 @@ is *function application*.  There are two ways to write such a function in Lean:
 
 Let us start by considering the implication
 
+
     A → A
 
 In term mode, an inhabitant of this type is the identity function:
@@ -225,8 +226,8 @@ __Checkpoint 3__  Prove the K combinator in tactic mode.
 -/
 
 theorem k_tac {P Q : Prop} : P → Q → P := by
-  sorry
-
+  intro p q
+  exact p
 
 /-
 Now consider the type:
@@ -294,7 +295,7 @@ It is inhabited by functions that take as input an element `a : A` and a functio
 -/
 
 theorem mp_term_data {A B : Prop} : A → (A → B) → B :=
-  sorry
+  fun a f => f a
 
 /-
 In logic, the type above is a proposition known as **modus ponens**:
@@ -306,10 +307,12 @@ Write proofs (both in term mode and tactic mode) for it.
 -/
 
 theorem mp_term {P Q : Prop} : P → (P → Q) → Q :=
-  sorry
+  fun a f => f a
 
 theorem mp_tac {P Q : Prop} : P → (P → Q) → Q := by
-  sorry
+  intro a f
+  apply f
+  exact a
 
 
 end Implication
@@ -428,7 +431,10 @@ proof are, for Lean, the same object.
 
 The second claim is (of course) rejected: two arbitrary numbers are not always equal.
 
-The third claim is accepted, but not because of proof irrelevance: `A × B` is a type of data, not a proposition.  It is accepted because the two functions are *definitionally* equal. Unfolding the definitions, `rcases` produces `Prod.casesOn p (fun a _ => a)`, and Lean reduces this to `p.1` using *structure eta*: a pair `p` is definitionally equal to the
+The third claim is accepted, but not because of proof irrelevance: `A × B` is a type of data,
+not a proposition.  It is accepted because the two functions are *definitionally* equal.
+Unfolding the definitions, `rcases` produces `Prod.casesOn p (fun a _ => a)`,
+and Lean reduces this to `p.1` using *structure eta*: a pair `p` is definitionally equal to the
 pair `(p.1, p.2)` of its projections.  For data, `rfl` succeeds only when equality can be
 checked by unfolding and computation, which is stronger than "computing the same result
 on every input".
@@ -471,10 +477,14 @@ __Checkpoint 5__ Check that the same proofs hold when switching from types to pr
 -/
 
 theorem and_swap_term {P Q : Prop} : P ∧ Q → Q ∧ P :=
-  sorry
+  fun ⟨p,q⟩ => ⟨q,p⟩
 
 theorem and_swap_tac {P Q : Prop} : P ∧ Q → Q ∧ P := by
-  sorry
+  intro h
+  rcases h with ⟨q,p⟩
+  constructor
+  . exact p
+  . exact q
 
 
 /- ## Exercise: Currying and uncurrying (difficulty: 2/4)
@@ -484,16 +494,18 @@ Hint: to use a hypothesis `f : P ∧ Q → R` you must first build a proof of `P
 to use `h : P ∧ Q` as a function argument, take its components `h.1` and `h.2`. -/
 
 theorem curry_tac {P Q R : Prop} : (P ∧ Q → R) → P → Q → R := by
-  sorry
+  intro f p q
+  exact f ⟨p,q⟩
 
 theorem curry_term {P Q R : Prop} : (P ∧ Q → R) → P → Q → R :=
-  sorry
+  fun f p q => f ⟨p,q⟩
 
 theorem uncurry_tac {P Q R : Prop} : (P → Q → R) → P ∧ Q → R := by
-  sorry
+  intro f h
+  exact f h.1 h.2
 
 theorem uncurry_term {P Q R : Prop} : (P → Q → R) → P ∧ Q → R :=
-  sorry
+  fun f ⟨h1,h2⟩ => f h1 h2
 
 end Conjunction
 
@@ -566,7 +578,7 @@ __Checkpoint 6__  In `or_swap_tac`, put the cursor after the line
 Which hypotheses does each goal have?  Why a disjunction cannot be used to prove
 something that needs both `p` and `q`?
 -/
-
+--2 goal, p : P ⊢ Q ∨ P   and   q : Q ⊢ Q ∨ P, ..
 
 /-
 __Checkpoint 7__  Decide, without trying, which of the following are provable.
@@ -580,7 +592,7 @@ Ask yourself for each one: *can I write a total function of this type?*
     (e)  P ∧ Q → P ∨ Q
     (f)  P ∨ Q → P ∧ Q
 -/
-
+-- a,c,e
 
 /- ## Exercise: Elimination Rule (difficulty: 2/4)__
 
@@ -588,10 +600,16 @@ Prove the *elimination rule* of disjunction: if `P` implies `R` and `Q` implies 
 -/
 
 theorem or_elim_tac {P Q R : Prop} : (P → R) → (Q → R) → P ∨ Q → R := by
-  sorry
+  intro h k o
+  rcases o with a | b
+  . exact h a
+  . exact k b
 
 theorem or_elim_term {P Q R : Prop} : (P → R) → (Q → R) → P ∨ Q → R :=
-  sorry
+  fun h k o =>
+    match o with
+    | .inl a => h a
+    | .inr b => k b
 
 end Disjunction
 
