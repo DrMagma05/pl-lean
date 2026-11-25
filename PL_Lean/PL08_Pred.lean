@@ -90,15 +90,15 @@ __Checkpoint 1__  Predict the types of the following expressions, then check the
 Which of them are propositions? Which of them are predicates? Which of them are not well-typed?
 -/
 
--- #check IsZero
--- #check IsZero (2+2)
--- #check if True then True else False
--- #check if (IsZero 0) = true then True else False
--- #check (fun (n : Nat) => n + 1 = 3)
--- #check (fun (n : Nat) => if n = 0 then true else false)
--- #check Even
--- #check (fun (d n : Nat) => ∃ q, n = d * q)
--- #check (fun (n : Nat) => ∀ q, (∃ d, n = d * q) → q = 1 ∨ q = n)
+#check IsZero
+#check IsZero (2+2)
+#check if True then True else False
+--#check if (IsZero 0) = true then True else False
+#check (fun (n : Nat) => n + 1 = 3)
+#check (fun (n : Nat) => if n = 0 then true else false)
+#check Even
+#check (fun (d n : Nat) => ∃ q, n = d * q)
+#check (fun (n : Nat) => ∀ q, (∃ d, n = d * q) → q = 1 ∨ q = n)
 
 
 /-
@@ -242,9 +242,9 @@ and over types. Predict the *type* of each of the following statements: is it a 
 or something bigger? (Recall the note on universes in the lab on polymorphism.)
 -/
 
--- #check (∀ n : Nat, n + 0 = n)
--- #check (∀ P : Prop, P → P)
--- #check (∀ A : Type, A → A)
+#check (∀ n : Nat, n + 0 = n)
+#check (∀ P : Prop, P → P)
+#check (∀ A : Type, A → A)
 
 /-
 Note that the third has type `Type 1`: it is the type of the polymorphic identity function
@@ -270,11 +270,20 @@ then every `x` satisfies `P` or `Q`. -/
 
 theorem forall_or {A : Type} {P Q : A → Prop} :
     (∀ x, P x) ∨ (∀ x, Q x) → ∀ x, P x ∨ Q x := by
-  sorry
+  intro h x
+  rcases h with hp | hq
+  . left
+    exact hp x
+  . right
+    exact hq x
+
 
 theorem forall_or_term {A : Type} {P Q : A → Prop} :
     (∀ x, P x) ∨ (∀ x, Q x) → ∀ x, P x ∨ Q x :=
-  sorry
+  fun h x =>
+  match h with
+  | .inl hp => .inl (hp x)
+  | .inr hq => .inr (hq x)
 
 /-
 Note that the previous proof works as well to show the following type is inhabited.
@@ -336,21 +345,22 @@ following constraints.
 -/
 
 theorem exists_pair : ∃ n : Nat, ∃ m : Nat, n + m = 5 ∧ n+1 = m := by
-  sorry
+  exists 2
+  exists 3
 
 /- In the proof term, be aware that your goal is a conjunction. -/
 theorem exists_pair_term : ∃ n : Nat, ∃ m : Nat, (n + m = 5 ∧ n+1 = m) :=
-  sorry
-
+   ⟨2,⟨3,⟨rfl,rfl⟩⟩⟩ --⟨2,3,rfl,rfl⟩
 
 /- __Exercise (difficulty: 1/4)__ Existential introduction:
 if `a` satisfies `P`, then there exists some `x` that satisfies `P`. -/
 
 theorem exists_intro {A : Type} {P : A → Prop} (a : A) : P a → ∃ x, P x := by
-  sorry
+  intro h
+  exists a
 
 theorem exists_intro_term {A : Type} {P : A → Prop} (a : A) : P a → ∃ x, P x :=
-  sorry
+  fun h => ⟨a,h⟩
 
 
 /- The following proof shows how to use an existential in the context.
@@ -378,7 +388,12 @@ then some `x` satisfies `P` and some `x` satisfies `Q`. -/
 
 theorem exists_and {A : Type} {P Q : A → Prop} :
     (∃ x, P x ∧ Q x) → (∃ x, P x) ∧ (∃ x, Q x) := by
-  sorry
+  intro xh
+  rcases xh with ⟨x,h⟩
+  rcases h with ⟨hp,hq⟩
+  constructor
+  . exists x
+  . exists x
 
 
 /-
@@ -396,8 +411,10 @@ is related by `R` to every `y`, then every `y` is related to some `x`. -/
 
 theorem exists_forall_forall_exists {A B : Type} {R : A → B → Prop} :
     (∃ x, ∀ y, R x y) → ∀ y, ∃ x, R x y := by
-  sorry
-
+  intro h y
+  rcases h with ⟨x,h₁⟩
+  exists x
+  exact h₁ y
 
 /-
 __Checkpoint 5__  Is the **converse** `(∀ y, ∃ x, R x y) → ∃ x, ∀ y, R x y` provable?
@@ -426,7 +443,18 @@ satisfy `P`. -/
 
 theorem not_exists_forall_not {A : Type} {P : A → Prop} :
   (¬ ∃ x, P x) ↔ ∀ x, ¬ P x := by
-  sorry
+  constructor
+  . intro xh
+    intro x
+    intro px
+    apply xh
+    exists x
+  . intro h
+    intro px
+    rcases px with ⟨x,p⟩
+    apply h x
+    exact p
+
 
 end Negation
 
