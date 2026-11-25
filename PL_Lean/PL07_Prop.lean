@@ -716,6 +716,12 @@ to the proof, and obtain a contradiction.
 
 What goal do you have?  What can you do with `h`?  Why are you stuck?
 -/
+theorem dne_attempt {P : Prop} : ¬¬P → P := by
+  intro h
+  simp at h
+  exact h
+theorem dne_attempt₁ {P : Prop} : ¬¬P → P := by
+  simp
 
 /- We now prove that from a contradiction, anything follows: `P → ¬P → Q`.  -/
 
@@ -752,8 +758,7 @@ Give tactic proof and term proof of:
 -/
 
 theorem contrapositive_term {P Q : Prop} : (P → Q) → ¬Q → ¬P :=
-  sorry
-
+  fun h => sorry
 theorem contrapositive_tac {P Q : Prop} : (P → Q) → ¬Q → ¬P := by
   sorry
 
